@@ -1,65 +1,52 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Bookmark, Copy, Play, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 
-// Mock data for presets
-const mockPresets = [
-  {
-    id: "1",
-    name: "Basic Network Scan",
-    command: "nmap",
-    options: { sV: true, p: "1-1000" },
-    preview: "nmap -sV -p 1-1000 192.168.1.1",
-    category: "information-gathering",
-  },
-  {
-    id: "2",
-    name: "Full Port Scan",
-    command: "nmap",
-    options: { sS: true, p: "-", A: true },
-    preview: "nmap -sS -p- -A 192.168.1.1",
-    category: "information-gathering",
-  },
-  {
-    id: "3",
-    name: "WordPress Scan",
-    command: "wpscan",
-    options: { url: "http://example.com", enumerate: "u" },
-    preview: "wpscan --url http://example.com --enumerate u",
-    category: "vulnerability-analysis",
-  },
-]
+export interface Preset {
+  id: string;
+  name: string;
+  command: string;
+  options: Record<string, unknown>;
+  preview: string;
+  category: string;
+}
 
-export default function CommandPresets() {
-  const [presets, setPresets] = useState(mockPresets)
+interface CommandPresetsProps {
+  onLoadPreset: (preset: Preset) => void;
+}
 
-  const handleCopyCommand = (command:string) => {
+export default function CommandPresets({ onLoadPreset }: CommandPresetsProps) {
+  const [presets, setPresets] = useState<Preset[]>([])
+
+  useEffect(() => {
+    const storedPresets = localStorage.getItem('commandPresets')
+    if (storedPresets) {
+      setPresets(JSON.parse(storedPresets))
+    }
+  }, [])
+
+  const handleCopyCommand = (command: string) => {
     navigator.clipboard.writeText(command)
     // Show a toast notification
     alert("Command copied to clipboard")
   }
 
-  const handleDeletePreset = (id:string) => {
+  const handleDeletePreset = (id: string) => {
     if (confirm("Are you sure you want to delete this preset?")) {
-      setPresets(presets.filter((preset) => preset.id !== id))
+      const updatedPresets = presets.filter((preset) => preset.id !== id)
+      setPresets(updatedPresets)
+      localStorage.setItem('commandPresets', JSON.stringify(updatedPresets))
     }
   }
 
-  const handleLoadPreset = (preset: {
-    id: string;
-    name: string;
-    command: string;
-    options: Record<string, unknown>;
-    preview: string;
-    category: string;
-  }) => {
-    // In a real app, this would load the preset into the command builder
-    alert(`Loading preset: ${preset.name}`);
-  };
+  const handleLoadPreset = (preset: Preset) => {
+    onLoadPreset(preset)
+  }
+
   if (presets.length === 0) {
     return (
       <div className="text-center p-4 text-zinc-400">
@@ -120,4 +107,3 @@ export default function CommandPresets() {
     </ScrollArea>
   )
 }
-

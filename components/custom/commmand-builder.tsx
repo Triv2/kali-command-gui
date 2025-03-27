@@ -32,8 +32,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Card,
@@ -53,7 +52,7 @@ import {
 } from "@/lib/commands";
 import CommandOptions from "./command-options";
 import CommandHistory from "./command-history";
-import CommandPresets from "./command-presets";
+import CommandPresets, { Preset } from "./command-presets";
 
 export default function CommandBuilder() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -62,10 +61,9 @@ export default function CommandBuilder() {
   const [commandOptions, setCommandOptions] = useState<
     Record<string, string | boolean>
   >({});
-
   const [commandPreview, setCommandPreview] = useState<string>("");
   const [commandExplanation, setCommandExplanation] = useState<string>("");
-  const [securityMode, setSecurityMode] = useState<boolean>(true);
+  // const [securityMode, setSecurityMode] = useState<boolean>(true);
   const [commandHistory, setCommandHistory] = useState<
     Array<{
       id: string;
@@ -80,6 +78,14 @@ export default function CommandBuilder() {
       description: string;
     }>
   >([]);
+  const [savedPresets, setSavedPresets] = useState<Array<{
+    id: string;
+    name: string;
+    command: string;
+    options: Record<string, string | boolean>;
+    preview: string;
+    category: string;
+  }>>([]);
 
   // Load commands for the selected category
   useEffect(() => {
@@ -117,6 +123,17 @@ export default function CommandBuilder() {
     );
     setCommandExplanation(explanation);
   }, [selectedCommand, commandOptions]);
+
+  useEffect(() => {
+    loadPresetsFromLocalStorage();
+  }, []);
+
+  const loadPresetsFromLocalStorage = () => {
+    const storedPresets = localStorage.getItem('commandPresets');
+    if (storedPresets) {
+      setSavedPresets(JSON.parse(storedPresets));
+    }
+  };
 
   const handleCommandSelect = (command: string) => {
     setSelectedCommand(command);
@@ -160,11 +177,20 @@ export default function CommandBuilder() {
         preview: commandPreview,
         category: selectedCategory,
       };
-
-      // In a real app, this would be saved to localStorage or a database
+  
+      // Save to localStorage and update state
+      const updatedPresets = [...savedPresets, preset];
+      localStorage.setItem('commandPresets', JSON.stringify(updatedPresets));
+      setSavedPresets(updatedPresets);
+  
       alert(`Preset "${presetName}" saved`);
-      console.log(preset); // Use the preset object to prevent the unused variable warning
     }
+  };
+
+  const handleLoadPreset = (preset: Preset) => {
+    setSelectedCommand(preset.command);
+    setCommandOptions(preset.options as Record<string, string | boolean>);
+    setSelectedCategory(preset.category);
   };
 
   const filteredCommands = availableCommands.filter(
@@ -174,6 +200,8 @@ export default function CommandBuilder() {
   );
   // Get shell examples for the selected command
   const shellExamples = getCommandShellExamples(selectedCommand);
+
+  const shellCodeStyle = "bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800 text-sm break-words"
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -275,14 +303,14 @@ export default function CommandBuilder() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <div className="flex items-center space-x-2">
-              <Switch
+              {/* <Switch
                 id="security-mode"
                 checked={securityMode}
                 onCheckedChange={setSecurityMode}
               />
               <Label htmlFor="security-mode" className="text-sm text-zinc-300">
                 Security Mode (Sandbox Execution)
-              </Label>
+              </Label> */}
             </div>
             <div className="space-x-2">
               <Button
@@ -397,7 +425,7 @@ export default function CommandBuilder() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <CommandPresets />
+              <CommandPresets onLoadPreset={handleLoadPreset} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -417,7 +445,7 @@ export default function CommandBuilder() {
                         Simple Example
                       </AccordionTrigger>
                       <AccordionContent>
-                        <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                        <div className={shellCodeStyle}>
                           ${" "}
                           {selectedCommand === "nmap"
                             ? "nmap 192.168.1.1"
@@ -440,7 +468,7 @@ export default function CommandBuilder() {
                       <AccordionContent>
                         {selectedCommand === "nmap" && (
                           <>
-                            <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                            <div className={shellCodeStyle}>
                               $ nmap -sV -p 1-1000 192.168.1.1
                             </div>
                             <p className="text-sm text-zinc-300">
@@ -451,7 +479,7 @@ export default function CommandBuilder() {
                         )}
                         {selectedCommand === "hydra" && (
                           <>
-                            <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                            <div className={shellCodeStyle}>
                               $ hydra -l admin -P wordlist.txt 192.168.1.1
                               http-post-form
                               &quot;/login:username=^USER^&password=^PASS^:F=Login
@@ -479,7 +507,7 @@ export default function CommandBuilder() {
                       <AccordionContent>
                         {selectedCommand === "nmap" && (
                           <>
-                            <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                            <div className={shellCodeStyle}>
                               $ nmap -sS -sV -sC -p- -T4 -A -v 192.168.1.0/24
                               -oA network_scan
                             </div>
@@ -562,7 +590,7 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Attacker (listener):
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.reverseShell.attacker}
                           </div>
                         </div>
@@ -573,7 +601,7 @@ export default function CommandBuilder() {
                             <p className="text-zinc-400 text-sm mb-1">
                               Victim (target):
                             </p>
-                            <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                            <div className={shellCodeStyle}>
                               $ {shellExamples.reverseShell.victim}
                             </div>
                           </div>
@@ -599,7 +627,7 @@ export default function CommandBuilder() {
                                     {key.charAt(0).toUpperCase() + key.slice(1)}
                                   </AccordionTrigger>
                                   <AccordionContent>
-                                    <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                                    <div className={shellCodeStyle}>
                                       $ {value}
                                     </div>
                                   </AccordionContent>
@@ -622,7 +650,7 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Victim (listener):
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             ${" "}
                             {typeof shellExamples.bindShell.victim === "string"
                               ? shellExamples.bindShell.victim
@@ -633,7 +661,7 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Attacker (connector):
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.bindShell.attacker}
                           </div>
                         </div>
@@ -652,7 +680,7 @@ export default function CommandBuilder() {
                             <p className="text-zinc-400 text-sm mb-1">
                               Setup (generate certificate):
                             </p>
-                            <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                            <div className={shellCodeStyle}>
                               $ {shellExamples.encryptedReverseShell.setup}
                             </div>
                           </div>
@@ -661,7 +689,7 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Attacker (listener):
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.encryptedReverseShell.attacker}
                           </div>
                         </div>
@@ -669,7 +697,7 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Victim (target):
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.encryptedReverseShell.victim}
                           </div>
                         </div>
@@ -687,13 +715,13 @@ export default function CommandBuilder() {
                           <p className="text-zinc-400 text-sm mb-1">
                             Generate payload:
                           </p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.encodedPayload.command}
                           </div>
                         </div>
                         <div>
                           <p className="text-zinc-400 text-sm mb-1">Usage:</p>
-                          <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
+                          <div className={shellCodeStyle}>
                             $ {shellExamples.encodedPayload.usage}
                           </div>
                         </div>
