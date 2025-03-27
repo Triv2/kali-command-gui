@@ -4,8 +4,8 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-import type { Command, CommandOption } from "./types"
-import { commandsDatabase } from "./database"
+import type { Command, CommandOption } from "./commands/types"
+import { commandsDatabase } from "./commands/database"
 
 // Helper functions to get commands and options
 export function getCommandsByCategory(category: string): Command[] {

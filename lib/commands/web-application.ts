@@ -45,55 +45,55 @@ export const webApplicationCommands: Command[] = [
     ],
     documentation: "https://portswigger.net/burp/documentation",
   },
-  {
-    name: "sqlmap",
-    description: "Automatic SQL injection tool",
-    explanation: "Automates the detection and exploitation of SQL injection vulnerabilities.",
-    examples: {
-      simple: {
-        command: 'sqlmap -u "http://example.com/page.php?id=1"',
-        description: "Basic SQL injection test on a URL parameter.",
-      },
-      intermediate: {
-        command: 'sqlmap -u "http://example.com/page.php?id=1" --dbms=mysql --dump',
-        description: "SQL injection test specifying MySQL as the database and dumping the database.",
-      },
-      advanced: {
-        command: 'sqlmap -u "http://example.com/page.php?id=1" --dbms=mysql --level=5 --risk=3 --dump-all --batch',
-        description: "Aggressive SQL injection test with maximum level and risk, dumping all databases.",
-      },
-    },
-    options: [
-      {
-        name: "u",
-        type: "string",
-        description: "Target URL",
-        placeholder: "http://example.com/page.php?id=1",
-        required: true,
-      },
-      {
-        name: "p",
-        type: "string",
-        description: "Testable parameter(s)",
-        placeholder: "id",
-        common: true,
-      },
-      {
-        name: "dbms",
-        type: "string",
-        description: "Force DBMS type",
-        placeholder: "mysql",
-        common: false,
-      },
-      {
-        name: "dump",
-        type: "boolean",
-        description: "Dump database table entries",
-        common: true,
-      },
-    ],
-    documentation: "https://github.com/sqlmapproject/sqlmap/wiki",
-  },
+  // {
+  //   name: "sqlmap",
+  //   description: "Automatic SQL injection tool",
+  //   explanation: "Automates the detection and exploitation of SQL injection vulnerabilities.",
+  //   examples: {
+  //     simple: {
+  //       command: 'sqlmap -u "http://example.com/page.php?id=1"',
+  //       description: "Basic SQL injection test on a URL parameter.",
+  //     },
+  //     intermediate: {
+  //       command: 'sqlmap -u "http://example.com/page.php?id=1" --dbms=mysql --dump',
+  //       description: "SQL injection test specifying MySQL as the database and dumping the database.",
+  //     },
+  //     advanced: {
+  //       command: 'sqlmap -u "http://example.com/page.php?id=1" --dbms=mysql --level=5 --risk=3 --dump-all --batch',
+  //       description: "Aggressive SQL injection test with maximum level and risk, dumping all databases.",
+  //     },
+  //   },
+  //   options: [
+  //     {
+  //       name: "u",
+  //       type: "string",
+  //       description: "Target URL",
+  //       placeholder: "http://example.com/page.php?id=1",
+  //       required: true,
+  //     },
+  //     {
+  //       name: "p",
+  //       type: "string",
+  //       description: "Testable parameter(s)",
+  //       placeholder: "id",
+  //       common: true,
+  //     },
+  //     {
+  //       name: "dbms",
+  //       type: "string",
+  //       description: "Force DBMS type",
+  //       placeholder: "mysql",
+  //       common: false,
+  //     },
+  //     {
+  //       name: "dump",
+  //       type: "boolean",
+  //       description: "Dump database table entries",
+  //       common: true,
+  //     },
+  //   ],
+  //   documentation: "https://github.com/sqlmapproject/sqlmap/wiki",
+  // },
   {
     name: "xsser",
     description: "Cross Site Scripting (XSS) vulnerability detection and exploitation",

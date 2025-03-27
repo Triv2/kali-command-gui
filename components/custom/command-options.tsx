@@ -13,8 +13,8 @@ import { CommandOption } from "@/lib/commands/types"
 
 interface CommandOptionsProps {
   commandName: string
-  options: Record<string, any>
-  onOptionChange: (name: string, value: any) => void
+  options: Record<string, string | boolean>
+  onOptionChange: (name: string, value: string | boolean) => void
 }
 
 export default function CommandOptions({ commandName, options, onOptionChange }: CommandOptionsProps) {
@@ -115,11 +115,11 @@ export default function CommandOptions({ commandName, options, onOptionChange }:
 
 interface OptionInputProps {
   option: CommandOption
-  value: any
-  onChange: (value: any) => void
+  value: string | boolean
+  onChange: (value: string | boolean) => void
 }
 
-function OptionInput({ option, value, onChange }: OptionInputProps) {
+function OptionInput({ option, value, onChange }: OptionInputProps) { 
   if (option.type === "boolean") {
     return (
       <div className="flex items-start space-x-2">
@@ -148,7 +148,7 @@ function OptionInput({ option, value, onChange }: OptionInputProps) {
       <Input
         id={option.name}
         placeholder={option.placeholder || `Enter ${option.name}`}
-        value={value}
+        value={typeof value === 'string' ? value : ''}
         onChange={(e) => onChange(e.target.value)}
         className="bg-zinc-950 border-zinc-700 text-white"
       />
