@@ -11,7 +11,7 @@ export interface CommandExamples {
   advanced: CommandExample
 }
 
-export interface CommandOption {
+export type CommandOption = {
   name: string
   type: string
   description: string

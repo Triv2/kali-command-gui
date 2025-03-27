@@ -79,7 +79,7 @@ export default function CommandHistory({ history = [] }: { history: CommandHisto
               <div className="flex justify-between items-center mt-2 text-xs text-zinc-400">
                 <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}</span>
                 <Badge
-                  variant={item.status === "completed" ? "success" : "destructive"}
+                  variant={item.status === "completed" ? "default" : "destructive"}
                   className={
                     item.status === "completed"
                       ? "bg-green-900/50 text-green-400 hover:bg-green-900/50 border border-green-700"

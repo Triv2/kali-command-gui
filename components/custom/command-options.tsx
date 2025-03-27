@@ -1,15 +1,24 @@
 "use client"
 
-import { useState, useEffect } from "react"
+
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { getCommandOptions } from "@/lib/commands"
+import { useState, useEffect } from "react"
+import { CommandOption } from "@/lib/commands/types"
 
-export default function CommandOptions({ commandName, options, onOptionChange }) {
-  const [commandOptions, setCommandOptions] = useState([])
+
+interface CommandOptionsProps {
+  commandName: string
+  options: Record<string, any>
+  onOptionChange: (name: string, value: any) => void
+}
+
+export default function CommandOptions({ commandName, options, onOptionChange }: CommandOptionsProps) {
+  const [commandOptions, setCommandOptions] = useState<CommandOption[]>([])
 
   useEffect(() => {
     if (commandName) {
@@ -104,7 +113,13 @@ export default function CommandOptions({ commandName, options, onOptionChange })
   )
 }
 
-function OptionInput({ option, value, onChange }) {
+interface OptionInputProps {
+  option: CommandOption
+  value: any
+  onChange: (value: any) => void
+}
+
+function OptionInput({ option, value, onChange }: OptionInputProps) {
   if (option.type === "boolean") {
     return (
       <div className="flex items-start space-x-2">

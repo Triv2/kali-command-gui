@@ -31,9 +31,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import CommandOptions from "@/components/command-options"
-import CommandHistory from "@/components/command-history"
-import CommandPresets from "@/components/command-presets"
+
 import {
   commandCategories,
   getCommandsByCategory,
@@ -41,17 +39,29 @@ import {
   getCommandDocumentation,
   getCommandShellExamples,
 } from "@/lib/commands"
+import CommandOptions from "./command-options"
+import CommandHistory from "./command-history"
+import CommandPresets from "./command-presets"
 
 export default function CommandBuilder() {
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedCommand, setSelectedCommand] = useState("")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [commandOptions, setCommandOptions] = useState({})
-  const [commandPreview, setCommandPreview] = useState("")
-  const [commandExplanation, setCommandExplanation] = useState("")
-  const [securityMode, setSecurityMode] = useState(true)
-  const [commandHistory, setCommandHistory] = useState([])
-  const [availableCommands, setAvailableCommands] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedCommand, setSelectedCommand] = useState<string>("")
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [commandOptions, setCommandOptions] = useState<Record<string, unknown>>({})
+
+  const [commandPreview, setCommandPreview] = useState<string>("")
+  const [commandExplanation, setCommandExplanation] = useState<string>("")
+  const [securityMode, setSecurityMode] = useState<boolean>(true)
+  const [commandHistory, setCommandHistory] = useState<Array<{
+    id: string;
+    command: string;
+    timestamp: string;
+    status: 'completed' | 'failed';
+  }>>([])
+  const [availableCommands, setAvailableCommands] = useState<Array<{
+    name: string;
+    description: string;
+  }>>([])
 
   // Load commands for the selected category
   useEffect(() => {
@@ -60,7 +70,7 @@ export default function CommandBuilder() {
     if (commands.length > 0 && !commands.find((cmd) => cmd.name === selectedCommand)) {
       setSelectedCommand(commands[0].name)
     }
-  }, [selectedCategory])
+  }, [selectedCategory, selectedCommand])
 
   // Update command preview when command or options change
   useEffect(() => {
@@ -84,12 +94,12 @@ export default function CommandBuilder() {
     setCommandExplanation(explanation)
   }, [selectedCommand, commandOptions])
 
-  const handleCommandSelect = (command) => {
+  const handleCommandSelect = (command: string) => {
     setSelectedCommand(command)
     setCommandOptions({})
   }
 
-  const handleOptionChange = (name, value) => {
+  const handleOptionChange = (name: string, value: unknown) => {
     setCommandOptions((prev) => ({
       ...prev,
       [name]: value,
@@ -97,22 +107,19 @@ export default function CommandBuilder() {
   }
 
   const handleExecuteCommand = () => {
-    // In a real implementation, this would send the command to a backend
-    // For now, we'll just add it to history
     const timestamp = new Date().toISOString()
     const newHistoryItem = {
       id: timestamp,
       command: commandPreview,
       timestamp,
-      status: "completed",
+      status: 'completed' as const,
     }
-
+  
     setCommandHistory((prev) => [newHistoryItem, ...prev])
-
-    // Show an alert or notification that the command was executed
+  
     alert(`Command executed: ${commandPreview}`)
   }
-
+  
   const handleCopyCommand = () => {
     navigator.clipboard.writeText(commandPreview)
     // Show a toast notification
@@ -133,15 +140,15 @@ export default function CommandBuilder() {
 
       // In a real app, this would be saved to localStorage or a database
       alert(`Preset "${presetName}" saved`)
+      console.log(preset) // Use the preset object to prevent the unused variable warning
     }
   }
 
   const filteredCommands = availableCommands.filter(
     (cmd) =>
       cmd.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cmd.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      cmd.description.toLowerCase().includes(searchQuery.toLowerCase())
   )
-
   // Get shell examples for the selected command
   const shellExamples = getCommandShellExamples(selectedCommand)
 
@@ -196,7 +203,7 @@ export default function CommandBuilder() {
                   </div>
                 ))
               ) : (
-                <div className="text-center p-4 text-zinc-400">No commands found matching "{searchQuery}"</div>
+                <div className="text-center p-4 text-zinc-400">No commands found matching {searchQuery}</div>
               )}
             </ScrollArea>
           </CardContent>

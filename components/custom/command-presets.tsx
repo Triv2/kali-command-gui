@@ -37,13 +37,13 @@ const mockPresets = [
 export default function CommandPresets() {
   const [presets, setPresets] = useState(mockPresets)
 
-  const handleCopyCommand = (command) => {
+  const handleCopyCommand = (command:string) => {
     navigator.clipboard.writeText(command)
     // Show a toast notification
     alert("Command copied to clipboard")
   }
 
-  const handleDeletePreset = (id) => {
+  const handleDeletePreset = (id:string) => {
     if (confirm("Are you sure you want to delete this preset?")) {
       setPresets(presets.filter((preset) => preset.id !== id))
     }
