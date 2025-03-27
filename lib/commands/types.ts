@@ -20,9 +20,14 @@ export type CommandOption = {
   required?: boolean
 }
 
-export interface ShellExample {
+export interface ReverseShellExample {
   attacker: string
   victim: string | Record<string, string>
+}
+
+export interface BindShellExample {
+  attacker: string
+  victim: string
 }
 
 export interface EncodedPayloadExample {
@@ -30,17 +35,23 @@ export interface EncodedPayloadExample {
   usage: string
 }
 
-export interface EncryptedShellExample {
+export interface EncryptedReverseShellExample {
   setup: string
   attacker: string
   victim: string
 }
 
+
+
+
 export interface ShellExamples {
-  reverseShell?: ShellExample
-  bindShell?: ShellExample
-  encryptedReverseShell?: EncryptedShellExample
+  reverseShell?: ReverseShellExample
+  bindShell?: BindShellExample
+  encryptedReverseShell?: EncryptedReverseShellExample
   encodedPayload?: EncodedPayloadExample
+  alternativeReverseShell?: BindShellExample
+  udpReverseShell?: BindShellExample
+  ptyShell?: BindShellExample
 }
 
 export interface Command {

@@ -49,11 +49,17 @@ export default function CommandPresets() {
     }
   }
 
-  const handleLoadPreset = (preset) => {
+  const handleLoadPreset = (preset: {
+    id: string;
+    name: string;
+    command: string;
+    options: Record<string, unknown>;
+    preview: string;
+    category: string;
+  }) => {
     // In a real app, this would load the preset into the command builder
-    alert(`Loading preset: ${preset.name}`)
-  }
-
+    alert(`Loading preset: ${preset.name}`);
+  };
   if (presets.length === 0) {
     return (
       <div className="text-center p-4 text-zinc-400">

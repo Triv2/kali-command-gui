@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Search,
   Save,
@@ -13,10 +13,10 @@ import {
   ExternalLink,
   BookOpen,
   Terminal,
-} from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -25,12 +25,24 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import {
   commandCategories,
@@ -38,96 +50,107 @@ import {
   generateCommandExplanation,
   getCommandDocumentation,
   getCommandShellExamples,
-} from "@/lib/commands"
-import CommandOptions from "./command-options"
-import CommandHistory from "./command-history"
-import CommandPresets from "./command-presets"
+} from "@/lib/commands";
+import CommandOptions from "./command-options";
+import CommandHistory from "./command-history";
+import CommandPresets from "./command-presets";
 
 export default function CommandBuilder() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [selectedCommand, setSelectedCommand] = useState<string>("")
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [commandOptions, setCommandOptions] = useState<Record<string, unknown>>({})
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCommand, setSelectedCommand] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [commandOptions, setCommandOptions] = useState<
+    Record<string, string | boolean>
+  >({});
 
-  const [commandPreview, setCommandPreview] = useState<string>("")
-  const [commandExplanation, setCommandExplanation] = useState<string>("")
-  const [securityMode, setSecurityMode] = useState<boolean>(true)
-  const [commandHistory, setCommandHistory] = useState<Array<{
-    id: string;
-    command: string;
-    timestamp: string;
-    status: 'completed' | 'failed';
-  }>>([])
-  const [availableCommands, setAvailableCommands] = useState<Array<{
-    name: string;
-    description: string;
-  }>>([])
+  const [commandPreview, setCommandPreview] = useState<string>("");
+  const [commandExplanation, setCommandExplanation] = useState<string>("");
+  const [securityMode, setSecurityMode] = useState<boolean>(true);
+  const [commandHistory, setCommandHistory] = useState<
+    Array<{
+      id: string;
+      command: string;
+      timestamp: string;
+      status: "completed" | "failed";
+    }>
+  >([]);
+  const [availableCommands, setAvailableCommands] = useState<
+    Array<{
+      name: string;
+      description: string;
+    }>
+  >([]);
 
   // Load commands for the selected category
   useEffect(() => {
-    const commands = getCommandsByCategory(selectedCategory)
-    setAvailableCommands(commands)
-    if (commands.length > 0 && !commands.find((cmd) => cmd.name === selectedCommand)) {
-      setSelectedCommand(commands[0].name)
+    const commands = getCommandsByCategory(selectedCategory);
+    setAvailableCommands(commands);
+    if (
+      commands.length > 0 &&
+      !commands.find((cmd) => cmd.name === selectedCommand)
+    ) {
+      setSelectedCommand(commands[0].name);
     }
-  }, [selectedCategory, selectedCommand])
+  }, [selectedCategory, selectedCommand]);
 
   // Update command preview when command or options change
   useEffect(() => {
-    if (!selectedCommand) return
+    if (!selectedCommand) return;
 
-    let preview = selectedCommand
+    let preview = selectedCommand;
 
     // Add options to the preview
     Object.entries(commandOptions).forEach(([key, value]) => {
       if (value && typeof value === "boolean") {
-        preview += ` --${key}`
+        preview += ` --${key}`;
       } else if (value) {
-        preview += ` --${key} ${value}`
+        preview += ` --${key} ${value}`;
       }
-    })
+    });
 
-    setCommandPreview(preview)
+    setCommandPreview(preview);
 
     // Generate explanation for the current command
-    const explanation = generateCommandExplanation(selectedCommand, commandOptions)
-    setCommandExplanation(explanation)
-  }, [selectedCommand, commandOptions])
+    const explanation = generateCommandExplanation(
+      selectedCommand,
+      commandOptions
+    );
+    setCommandExplanation(explanation);
+  }, [selectedCommand, commandOptions]);
 
   const handleCommandSelect = (command: string) => {
-    setSelectedCommand(command)
-    setCommandOptions({})
-  }
+    setSelectedCommand(command);
+    setCommandOptions({});
+  };
 
-  const handleOptionChange = (name: string, value: unknown) => {
+  const handleOptionChange = (name: string, value: string | boolean) => {
     setCommandOptions((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
-
+    }));
+  };
   const handleExecuteCommand = () => {
-    const timestamp = new Date().toISOString()
+    const timestamp = new Date().toISOString();
     const newHistoryItem = {
       id: timestamp,
       command: commandPreview,
       timestamp,
-      status: 'completed' as const,
-    }
-  
-    setCommandHistory((prev) => [newHistoryItem, ...prev])
-  
-    alert(`Command executed: ${commandPreview}`)
-  }
-  
+      status: "completed" as const,
+    };
+
+    setCommandHistory((prev) => [newHistoryItem, ...prev]);
+
+    alert(`Command executed: ${commandPreview}`);
+  };
+
   const handleCopyCommand = () => {
-    navigator.clipboard.writeText(commandPreview)
+    navigator.clipboard.writeText(commandPreview);
     // Show a toast notification
-    alert("Command copied to clipboard")
-  }
+    alert("Command copied to clipboard");
+  };
 
   const handleSavePreset = () => {
-    const presetName = prompt("Enter a name for this preset:")
+    const presetName = prompt("Enter a name for this preset:");
     if (presetName) {
       const preset = {
         id: Date.now().toString(),
@@ -136,21 +159,21 @@ export default function CommandBuilder() {
         options: commandOptions,
         preview: commandPreview,
         category: selectedCategory,
-      }
+      };
 
       // In a real app, this would be saved to localStorage or a database
-      alert(`Preset "${presetName}" saved`)
-      console.log(preset) // Use the preset object to prevent the unused variable warning
+      alert(`Preset "${presetName}" saved`);
+      console.log(preset); // Use the preset object to prevent the unused variable warning
     }
-  }
+  };
 
   const filteredCommands = availableCommands.filter(
     (cmd) =>
       cmd.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cmd.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  );
   // Get shell examples for the selected command
-  const shellExamples = getCommandShellExamples(selectedCommand)
+  const shellExamples = getCommandShellExamples(selectedCommand);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -159,7 +182,9 @@ export default function CommandBuilder() {
         <Card className="bg-zinc-900 border-zinc-700">
           <CardHeader>
             <CardTitle className="text-white">Command Selection</CardTitle>
-            <CardDescription className="text-zinc-300">Choose a tool category and command</CardDescription>
+            <CardDescription className="text-zinc-300">
+              Choose a tool category and command
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="relative">
@@ -172,15 +197,24 @@ export default function CommandBuilder() {
               />
             </div>
 
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="bg-zinc-950 border-zinc-700 text-white">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-700">
                 <SelectGroup>
-                  <SelectLabel className="text-zinc-300">Categories</SelectLabel>
+                  <SelectLabel className="text-zinc-300">
+                    Categories
+                  </SelectLabel>
                   {commandCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id} className="text-white">
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                      className="text-white"
+                    >
                       {category.name}
                     </SelectItem>
                   ))}
@@ -194,16 +228,22 @@ export default function CommandBuilder() {
                   <div
                     key={command.name}
                     className={`p-2 rounded-md mb-1 cursor-pointer hover:bg-zinc-800 ${
-                      selectedCommand === command.name ? "bg-zinc-800 border border-primary" : ""
+                      selectedCommand === command.name
+                        ? "bg-zinc-800 border border-primary"
+                        : ""
                     }`}
                     onClick={() => handleCommandSelect(command.name)}
                   >
                     <div className="font-medium text-white">{command.name}</div>
-                    <div className="text-xs text-zinc-300">{command.description}</div>
+                    <div className="text-xs text-zinc-300">
+                      {command.description}
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center p-4 text-zinc-400">No commands found matching {searchQuery}</div>
+                <div className="text-center p-4 text-zinc-400">
+                  No commands found matching {searchQuery}
+                </div>
               )}
             </ScrollArea>
           </CardContent>
@@ -235,7 +275,11 @@ export default function CommandBuilder() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <div className="flex items-center space-x-2">
-              <Switch id="security-mode" checked={securityMode} onCheckedChange={setSecurityMode} />
+              <Switch
+                id="security-mode"
+                checked={securityMode}
+                onCheckedChange={setSecurityMode}
+              />
               <Label htmlFor="security-mode" className="text-sm text-zinc-300">
                 Security Mode (Sandbox Execution)
               </Label>
@@ -259,7 +303,11 @@ export default function CommandBuilder() {
                 <Save className="h-4 w-4 mr-2" />
                 Save Preset
               </Button>
-              <Button size="sm" onClick={handleExecuteCommand} className="bg-primary text-white hover:bg-primary/90">
+              <Button
+                size="sm"
+                onClick={handleExecuteCommand}
+                className="bg-primary text-white hover:bg-primary/90"
+              >
                 <Play className="h-4 w-4 mr-2" />
                 Execute
               </Button>
@@ -331,7 +379,9 @@ export default function CommandBuilder() {
             <Card className="bg-zinc-900 border-zinc-700">
               <CardHeader>
                 <CardTitle className="text-white">Command History</CardTitle>
-                <CardDescription className="text-zinc-300">Previously executed commands</CardDescription>
+                <CardDescription className="text-zinc-300">
+                  Previously executed commands
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <CommandHistory history={commandHistory} />
@@ -342,7 +392,9 @@ export default function CommandBuilder() {
             <Card className="bg-zinc-900 border-zinc-700">
               <CardHeader>
                 <CardTitle className="text-white">Saved Presets</CardTitle>
-                <CardDescription className="text-zinc-300">Your saved command configurations</CardDescription>
+                <CardDescription className="text-zinc-300">
+                  Your saved command configurations
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <CommandPresets />
@@ -361,10 +413,15 @@ export default function CommandBuilder() {
                 {selectedCommand ? (
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="simple" className="border-zinc-700">
-                      <AccordionTrigger className="text-white">Simple Example</AccordionTrigger>
+                      <AccordionTrigger className="text-white">
+                        Simple Example
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
-                          $ {selectedCommand === "nmap" ? "nmap 192.168.1.1" : `${selectedCommand} --help`}
+                          ${" "}
+                          {selectedCommand === "nmap"
+                            ? "nmap 192.168.1.1"
+                            : `${selectedCommand} --help`}
                         </div>
                         <p className="text-sm text-zinc-300">
                           {selectedCommand === "nmap"
@@ -373,8 +430,13 @@ export default function CommandBuilder() {
                         </p>
                       </AccordionContent>
                     </AccordionItem>
-                    <AccordionItem value="intermediate" className="border-zinc-700">
-                      <AccordionTrigger className="text-white">Intermediate Example</AccordionTrigger>
+                    <AccordionItem
+                      value="intermediate"
+                      className="border-zinc-700"
+                    >
+                      <AccordionTrigger className="text-white">
+                        Intermediate Example
+                      </AccordionTrigger>
                       <AccordionContent>
                         {selectedCommand === "nmap" && (
                           <>
@@ -382,53 +444,65 @@ export default function CommandBuilder() {
                               $ nmap -sV -p 1-1000 192.168.1.1
                             </div>
                             <p className="text-sm text-zinc-300">
-                              Scans the first 1000 ports of the target IP and attempts to determine service versions.
+                              Scans the first 1000 ports of the target IP and
+                              attempts to determine service versions.
                             </p>
                           </>
                         )}
                         {selectedCommand === "hydra" && (
                           <>
                             <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
-                              $ hydra -l admin -P wordlist.txt 192.168.1.1 http-post-form
-                              "/login:username=^USER^&password=^PASS^:F=Login failed"
+                              $ hydra -l admin -P wordlist.txt 192.168.1.1
+                              http-post-form
+                              &quot;/login:username=^USER^&password=^PASS^:F=Login
+                              failed&quot;
                             </div>
                             <p className="text-sm text-zinc-300">
-                              Attempts to brute force a web login form using the username "admin" and passwords from
+                              Attempts to brute force a web login form using the
+                              username &quot;admin&quot; and passwords from
                               wordlist.txt.
                             </p>
                           </>
                         )}
                         {!["nmap", "hydra"].includes(selectedCommand) && (
                           <p className="text-sm text-zinc-300">
-                            Intermediate examples for {selectedCommand} will be shown here.
+                            Intermediate examples for {selectedCommand} will be
+                            shown here.
                           </p>
                         )}
                       </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="advanced" className="border-zinc-700">
-                      <AccordionTrigger className="text-white">Advanced Example</AccordionTrigger>
+                      <AccordionTrigger className="text-white">
+                        Advanced Example
+                      </AccordionTrigger>
                       <AccordionContent>
                         {selectedCommand === "nmap" && (
                           <>
                             <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
-                              $ nmap -sS -sV -sC -p- -T4 -A -v 192.168.1.0/24 -oA network_scan
+                              $ nmap -sS -sV -sC -p- -T4 -A -v 192.168.1.0/24
+                              -oA network_scan
                             </div>
                             <p className="text-sm text-zinc-300">
-                              Comprehensive network scan with service detection, script scanning, OS detection, and
-                              verbose output saved to multiple formats.
+                              Comprehensive network scan with service detection,
+                              script scanning, OS detection, and verbose output
+                              saved to multiple formats.
                             </p>
                           </>
                         )}
                         {!["nmap"].includes(selectedCommand) && (
                           <p className="text-sm text-zinc-300">
-                            Advanced examples for {selectedCommand} will be shown here.
+                            Advanced examples for {selectedCommand} will be
+                            shown here.
                           </p>
                         )}
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
                 ) : (
-                  <div className="text-center p-4 text-zinc-400">Select a command to view examples</div>
+                  <div className="text-center p-4 text-zinc-400">
+                    Select a command to view examples
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -438,15 +512,17 @@ export default function CommandBuilder() {
               <CardHeader>
                 <CardTitle className="text-white">Tool Documentation</CardTitle>
                 <CardDescription className="text-zinc-300">
-                  Official documentation for {selectedCommand || "selected command"}
+                  Official documentation for{" "}
+                  {selectedCommand || "selected command"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {selectedCommand ? (
                   <div className="space-y-4">
                     <p className="text-zinc-300">
-                      Access the official documentation for {selectedCommand} to learn more about its capabilities,
-                      options, and usage examples.
+                      Access the official documentation for {selectedCommand} to
+                      learn more about its capabilities, options, and usage
+                      examples.
                     </p>
                     <a
                       href={getCommandDocumentation(selectedCommand)}
@@ -459,7 +535,9 @@ export default function CommandBuilder() {
                     </a>
                   </div>
                 ) : (
-                  <div className="text-center p-4 text-zinc-400">Select a command to view its documentation</div>
+                  <div className="text-center p-4 text-zinc-400">
+                    Select a command to view its documentation
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -476,28 +554,47 @@ export default function CommandBuilder() {
                 <CardContent>
                   {shellExamples.reverseShell && (
                     <div className="mb-6">
-                      <h3 className="text-white font-medium mb-2">Reverse Shell</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        Reverse Shell
+                      </h3>
                       <div className="space-y-3">
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Attacker (listener):</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Attacker (listener):
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                             $ {shellExamples.reverseShell.attacker}
                           </div>
                         </div>
 
-                        {typeof shellExamples.reverseShell.victim === "string" ? (
+                        {typeof shellExamples.reverseShell.victim ===
+                        "string" ? (
                           <div>
-                            <p className="text-zinc-400 text-sm mb-1">Victim (target):</p>
+                            <p className="text-zinc-400 text-sm mb-1">
+                              Victim (target):
+                            </p>
                             <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                               $ {shellExamples.reverseShell.victim}
                             </div>
                           </div>
                         ) : (
                           <div>
-                            <p className="text-zinc-400 text-sm mb-1">Victim (target) - Multiple options:</p>
-                            <Accordion type="single" collapsible className="w-full">
-                              {Object.entries(shellExamples.reverseShell.victim).map(([key, value]) => (
-                                <AccordionItem key={key} value={key} className="border-zinc-700">
+                            <p className="text-zinc-400 text-sm mb-1">
+                              Victim (target) - Multiple options:
+                            </p>
+                            <Accordion
+                              type="single"
+                              collapsible
+                              className="w-full"
+                            >
+                              {Object.entries(
+                                shellExamples.reverseShell.victim
+                              ).map(([key, value]) => (
+                                <AccordionItem
+                                  key={key}
+                                  value={key}
+                                  className="border-zinc-700"
+                                >
                                   <AccordionTrigger className="text-white">
                                     {key.charAt(0).toUpperCase() + key.slice(1)}
                                   </AccordionTrigger>
@@ -517,16 +614,25 @@ export default function CommandBuilder() {
 
                   {shellExamples.bindShell && (
                     <div className="mb-6">
-                      <h3 className="text-white font-medium mb-2">Bind Shell</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        Bind Shell
+                      </h3>
                       <div className="space-y-3">
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Victim (listener):</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Victim (listener):
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
-                            $ {shellExamples.bindShell.victim}
+                            ${" "}
+                            {typeof shellExamples.bindShell.victim === "string"
+                              ? shellExamples.bindShell.victim
+                              : JSON.stringify(shellExamples.bindShell.victim)}
                           </div>
                         </div>
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Attacker (connector):</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Attacker (connector):
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                             $ {shellExamples.bindShell.attacker}
                           </div>
@@ -537,24 +643,32 @@ export default function CommandBuilder() {
 
                   {shellExamples.encryptedReverseShell && (
                     <div className="mb-6">
-                      <h3 className="text-white font-medium mb-2">Encrypted Reverse Shell</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        Encrypted Reverse Shell
+                      </h3>
                       <div className="space-y-3">
                         {shellExamples.encryptedReverseShell.setup && (
                           <div>
-                            <p className="text-zinc-400 text-sm mb-1">Setup (generate certificate):</p>
+                            <p className="text-zinc-400 text-sm mb-1">
+                              Setup (generate certificate):
+                            </p>
                             <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                               $ {shellExamples.encryptedReverseShell.setup}
                             </div>
                           </div>
                         )}
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Attacker (listener):</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Attacker (listener):
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                             $ {shellExamples.encryptedReverseShell.attacker}
                           </div>
                         </div>
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Victim (target):</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Victim (target):
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                             $ {shellExamples.encryptedReverseShell.victim}
                           </div>
@@ -565,10 +679,14 @@ export default function CommandBuilder() {
 
                   {shellExamples.encodedPayload && (
                     <div>
-                      <h3 className="text-white font-medium mb-2">Encoded Payload</h3>
+                      <h3 className="text-white font-medium mb-2">
+                        Encoded Payload
+                      </h3>
                       <div className="space-y-3">
                         <div>
-                          <p className="text-zinc-400 text-sm mb-1">Generate payload:</p>
+                          <p className="text-zinc-400 text-sm mb-1">
+                            Generate payload:
+                          </p>
                           <div className="bg-black rounded-md p-3 font-mono text-green-400 mb-2 border border-zinc-800">
                             $ {shellExamples.encodedPayload.command}
                           </div>
@@ -585,9 +703,11 @@ export default function CommandBuilder() {
 
                   <div className="mt-4 bg-red-900/30 border border-red-700/50 rounded-md p-3">
                     <p className="text-sm text-red-300">
-                      <strong>Warning:</strong> These shell examples are provided for educational purposes only. Using
-                      these techniques without proper authorization is illegal and unethical. Always ensure you have
-                      permission before testing on any system.
+                      <strong>Warning:</strong> These shell examples are
+                      provided for educational purposes only. Using these
+                      techniques without proper authorization is illegal and
+                      unethical. Always ensure you have permission before
+                      testing on any system.
                     </p>
                   </div>
                 </CardContent>
@@ -597,6 +717,5 @@ export default function CommandBuilder() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
-

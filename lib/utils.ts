@@ -51,7 +51,7 @@ export function getCommandExplanation(commandName: string): string {
 }
 
 // Function to generate an explanation for the current command with options
-export function generateCommandExplanation(commandName: string, options: Record<string, any> = {}): string {
+export function generateCommandExplanation(commandName: string, options: Record<string, string | boolean> = {}): string {
   let explanation = getCommandExplanation(commandName)
 
   // Get the command options
@@ -78,7 +78,6 @@ export function generateCommandExplanation(commandName: string, options: Record<
 
   return explanation
 }
-
 // Add a function to get documentation URL
 export function getCommandDocumentation(commandName: string): string {
   for (const category in commandsDatabase) {
